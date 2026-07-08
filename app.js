@@ -117,7 +117,7 @@ const risks = [
         `Consulta vulnerable:\n${rawQuery}`,
         vulnerableMatch
           ? 'Vulnerable: la condición se altera y el filtro queda abierto para devolver más registros.'
-          : 'Vulnerable: la búsqueda solo funciona con valores exactos, pero sigue siendo insegura.',
+          : 'Seguro: la entrada no altera la consulta en este caso, aunque la concatenación sigue siendo una mala práctica.',
         `Seguro: consulta parametrizada -> SELECT * FROM users WHERE username = ? AND password = ?`,
         safeMatch
           ? `Resultado seguro: acceso de ${safeMatch.role}.`
@@ -196,9 +196,12 @@ const risks = [
       },
     ],
     run(state) {
+      const exposed = state.debug === 'on' || state.listing === 'on';
       return [
-        `Vulnerable: debug ${state.debug === 'on' ? 'activo' : 'apagado'} y listado ${state.listing === 'on' ? 'habilitado' : 'deshabilitado'}.`,
-        `Seguro: debug apagado, listado de directorios bloqueado y mensajes de error genéricos.`,
+        exposed
+          ? `Vulnerable: debug ${state.debug === 'on' ? 'activo' : 'apagado'} y listado ${state.listing === 'on' ? 'habilitado' : 'deshabilitado'}.`
+          : 'Seguro: debug apagado y listado de directorios bloqueado.',
+        'Seguro: los mensajes de error se mantienen genéricos y no revelan detalles internos.',
         'Menos información visible significa menos pistas para un atacante.',
       ].join('\n');
     },
@@ -307,8 +310,8 @@ const risks = [
     run(state) {
       const safe = state.signature === 'valid';
       return [
-        `Vulnerable: artefacto ${state.signature === 'tampered' ? 'alterado' : 'sin verificar'}.`,
-        safe ? 'Seguro: la firma coincide y la actualización puede aplicarse.' : 'Bloqueado: la firma no coincide y el paquete se rechaza.',
+        safe ? 'Seguro: la firma coincide y la actualización puede aplicarse.' : 'Vulnerable: artefacto alterado o sin verificar.',
+        safe ? 'Seguro: la firma valida la procedencia antes de instalar.' : 'Bloqueado: la firma no coincide y el paquete se rechaza.',
         'La verificación debe ocurrir antes de ejecutar el software o confiar en los datos.',
       ].join('\n');
     },
@@ -344,9 +347,12 @@ const risks = [
     ],
     run(state) {
       const count = Number(state.events);
+      const loggingEnabled = state.logging === 'on';
       return [
-        `Vulnerable: ${state.logging === 'on' ? 'sí' : 'no'} hay registros y se ven ${count} eventos sospechosos.`,
-        state.logging === 'on'
+        loggingEnabled
+          ? `Seguro: el registro activo conserva ${count} eventos sospechosos.`
+          : `Vulnerable: no hay registros y se ven ${count} eventos sospechosos.`,
+        loggingEnabled
           ? 'Seguro: los eventos quedan trazados y se puede alertar al equipo.'
           : 'Sin logs, el incidente puede quedar invisible para el operador.',
         count > 0 ? 'Con alertas, este patrón podría disparar una revisión temprana.' : 'Sin eventos, no hay señal que analizar.'
@@ -410,12 +416,32 @@ const lessonText = document.querySelector('#lessonText');
 const lessonPoints = document.querySelector('#lessonPoints');
 const controlStack = document.querySelector('#controlStack');
 const resultOutput = document.querySelector('#resultOutput');
+const riskSelector = document.querySelector('#riskSelector');
 const activeTitle = document.querySelector('#activeTitle');
 const activeSummary = document.querySelector('#activeSummary');
 const jumpToDemo = document.querySelector('#jumpToDemo');
 const resetButton = document.querySelector('#resetButton');
 
 let activeRiskId = risks[2].id;
+let visibleRiskFilter = 'all';
+
+function renderRiskSelector() {
+  riskSelector.innerHTML = '';
+
+  const allOption = document.createElement('option');
+  allOption.value = 'all';
+  allOption.textContent = 'Todos';
+  riskSelector.appendChild(allOption);
+
+  for (const risk of risks) {
+    const option = document.createElement('option');
+    option.value = risk.id;
+    option.textContent = `${risk.code} - ${risk.name}`;
+    riskSelector.appendChild(option);
+  }
+
+  riskSelector.value = visibleRiskFilter;
+}
 
 function createFieldControl(risk, field) {
   const wrapper = document.createElement('div');
@@ -492,10 +518,15 @@ function createFieldControl(risk, field) {
 function renderRiskList() {
   riskList.innerHTML = '';
 
-  for (const risk of risks) {
+  const visibleRisks = visibleRiskFilter === 'all'
+    ? risks
+    : risks.filter((risk) => risk.id === visibleRiskFilter);
+
+  for (const risk of visibleRisks) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = `risk-item ${risk.id === activeRiskId ? 'active' : ''}`;
+    button.dataset.riskId = risk.id;
     button.innerHTML = `<strong>${risk.code}</strong><span>${risk.name}</span><span>${risk.summary}</span>`;
     button.addEventListener('click', () => {
       setActiveRisk(risk.id);
@@ -507,7 +538,7 @@ function renderRiskList() {
 
 function syncRiskListActiveState() {
   riskList.querySelectorAll('.risk-item').forEach((item, index) => {
-    item.classList.toggle('active', risks[index].id === activeRiskId);
+    item.classList.toggle('active', item.dataset.riskId === activeRiskId);
   });
 }
 
@@ -540,6 +571,15 @@ function setActiveRisk(riskId) {
   updateDemo();
 }
 
+riskSelector.addEventListener('change', () => {
+  visibleRiskFilter = riskSelector.value;
+  if (visibleRiskFilter !== 'all') {
+    setActiveRisk(visibleRiskFilter);
+  }
+  renderRiskList();
+  updateDemo();
+});
+
 jumpToDemo.addEventListener('click', () => {
   document.querySelector('.demo-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
@@ -553,6 +593,7 @@ resetButton.addEventListener('click', () => {
   updateDemo();
 });
 
+renderRiskSelector();
 renderRiskList();
 renderControls(risks.find((item) => item.id === activeRiskId));
 updateDemo();

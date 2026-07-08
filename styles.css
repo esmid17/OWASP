@@ -231,6 +231,27 @@ h1 {
   padding: 20px;
 }
 
+.selector-group {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.selector-label {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.risk-selector {
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(6, 12, 22, 0.9);
+  color: var(--text);
+  padding: 0.85rem 0.95rem;
+  font: inherit;
+}
+
 .risk-list {
   display: grid;
   gap: 12px;

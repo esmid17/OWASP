@@ -45,7 +45,11 @@
       <aside class="sidebar">
         <div class="sidebar-card">
           <h3>Top 10</h3>
-          <p>Selecciona un riesgo para ver la demo correspondiente.</p>
+          <p>Selecciona un riesgo o muestra todos para comparar la lista completa.</p>
+          <div class="selector-group">
+            <label class="selector-label" for="riskSelector">Selector</label>
+            <select id="riskSelector" class="risk-selector" aria-label="Selector de riesgos OWASP"></select>
+          </div>
         </div>
         <div id="riskList" class="risk-list" aria-label="Lista de riesgos OWASP Top 10"></div>
       </aside>
@@ -72,7 +76,7 @@
           </div>
 
           <article class="explanation-card">
-            <h3>Qué deberías observar</h3>
+            <h3>Observaciones</h3>
             <p id="lessonText"></p>
             <ul id="lessonPoints" class="lesson-points"></ul>
           </article>
