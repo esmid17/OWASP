@@ -1,0 +1,12 @@
+{
+  "name": "owasp-top10-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Demo frontend estática y responsiva para mostrar ejemplos funcionales de OWASP Top 10.",
+  "scripts": {
+    "start": "serve ."
+  },
+  "devDependencies": {
+    "serve": "^14.2.4"
+  }
+}

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="OWASP Top 10 con ejemplos."
+    />
+    <title>OWASP Top 10 | Vulnerabilidades</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <script defer src="./app.js"></script>
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <header class="hero">
+      <nav class="topbar">
+        <div>
+          <p class="eyebrow">Ingeniería de la Seguridad</p>
+          <h1>OWASP Top 10</h1>
+        </div>
+      </nav>
+
+      <section class="hero-grid">
+        <article class="hero-card highlight-card">
+          <p class="highlight-label">Demostración activa</p>
+          <h2 id="activeTitle">Inyección SQL</h2>
+          <p id="activeSummary">
+            Una consulta armada por concatenación permite que entradas maliciosas alteren la lógica de búsqueda.
+          </p>
+          <button id="jumpToDemo" class="primary-button" type="button">Ir a ejemplo</button>
+        </article>
+      </section>
+    </header>
+
+    <main class="layout">
+      <aside class="sidebar">
+        <div class="sidebar-card">
+          <h3>Top 10</h3>
+          <p>Selecciona un riesgo para ver la demo correspondiente.</p>
+        </div>
+        <div id="riskList" class="risk-list" aria-label="Lista de riesgos OWASP Top 10"></div>
+      </aside>
+
+      <section class="demo-panel">
+        <div class="panel-header">
+          <div>
+            <p class="panel-kicker" id="riskCode">A03: Injection</p>
+            <h2 id="riskName">Inyección SQL</h2>
+          </div>
+          <p id="riskDescription" class="panel-description"></p>
+        </div>
+
+        <div class="panel-body">
+          <div class="demo-controls">
+            <div class="control-stack" id="controlStack"></div>
+            <div class="result-card">
+              <div class="result-head">
+                <h3>Resultado</h3>
+                <button id="resetButton" class="ghost-button" type="button">Restablecer</button>
+              </div>
+              <pre id="resultOutput" class="result-output" aria-live="polite"></pre>
+            </div>
+          </div>
+
+          <article class="explanation-card">
+            <h3>Qué deberías observar</h3>
+            <p id="lessonText"></p>
+            <ul id="lessonPoints" class="lesson-points"></ul>
+          </article>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
